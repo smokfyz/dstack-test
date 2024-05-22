@@ -16,7 +16,6 @@ log = logging.getLogger(__name__)
 
 
 LOGS_QUEUE_SIZE = 50
-LOGS_WAIT_TIMEOUT = 5
 
 
 class DockerManager:
@@ -119,17 +118,16 @@ class LogHandler:
     def flush_logs(self) -> None:
         while not self.finished.is_set() or not self.log_events_queue.empty():
             log_events = []
-            while len(log_events) < LOGS_QUEUE_SIZE:
+            for _ in range(self.log_events_queue.qsize()):
                 try:
-                    log_event = self.log_events_queue.get(timeout=LOGS_WAIT_TIMEOUT)
+                    log_event = self.log_events_queue.get(block=False)
                     log_events.append(log_event)
                 except queue.Empty:
                     break
-            if len(log_events) == 0:
-                return
-            self.cloudwatch_manager.send_logs(
-                self.group_name, self.stream_name, log_events
-            )
+            if len(log_events) != 0:
+                self.cloudwatch_manager.send_logs(
+                    self.group_name, self.stream_name, log_events
+                )
 
     def handle_log(self, log_message: str) -> None:
         log_event = {'timestamp': int(time.time() * 1000), 'message': log_message}
