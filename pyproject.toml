@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "dstack-test"
+version = "0.1.0"
+description = ""
+authors = ["Ivan Sharapenkov <ivan.sharapenkov@assaia.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+boto3 = "^1.34.110"
+docker = "^7.0.0"
+argparse = "^1.4.0"
+requests = "2.31.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
